@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fake Tiktok Chat - Zepar</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+<style>
+  :root{
+    --sakura-1:#2a0f3d; --sakura-2:#ff2e88; --sakura-3:#c026d3;
+    --lilac:#a855f7; --sky:#22d3ee; --ink:#efe6ff;
+    --paper:#0a0612; --card:#150c22; --gold:#ffd166;
+    --shadow: 0 10px 30px rgba(168, 40, 220, 0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh; font-family:'Zen Maru Gothic', sans-serif;
+    color:var(--ink); background-image: url('https://files.catbox.moe/71hgmr.jpg');
+    background-size: cover; background-position: center;
+    background-attachment: fixed; overflow-x:hidden;
+  }
+  .wrap{ max-width:1180px; margin:0 auto; padding:36px 20px 80px; }
+  .card{ background:var(--card); border-radius:22px; padding:26px 24px; box-shadow: var(--shadow); border:1px solid #3a1f52; margin-bottom: 20px;}
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:12.5px; font-weight:700; color:#9c7fc9; margin-bottom:6px; font-family:'Baloo 2', sans-serif; }
+  .field input, .field textarea{ width:100%; padding:11px 13px; border-radius:12px; border:1.5px solid #3a1f52; background:#0f0819; color:var(--ink); }
+  .make-btn{ width:100%; padding:14px; border-radius:14px; font-family:'Baloo 2'; font-weight:800; color:#fff; background: linear-gradient(135deg, var(--sakura-3), var(--sky)); cursor:pointer; border:none; margin-top: 10px;}
+  .canvas-frame{ width:100%; max-width:360px; border-radius:18px; border:6px solid #1a0e2b; background:#0f0819; margin: 20px auto; display:block; }
+  .canvas-frame canvas{ width:100%; display:block; }
+  .sidebar { position: fixed; left: -300px; top: 0; width: 300px; height: 100%; background: var(--card); border-right: 2px solid #3a1f52; transition: left 0.3s ease; z-index: 1000; padding: 20px; box-shadow: var(--shadow); }
+  .sidebar.active { left: 0; }
+  .sidebar h2 { color: #fff; font-family: 'Baloo 2'; margin-bottom: 30px; font-size: 24px; text-align: center; border-bottom: 1px solid #3a1f52; padding-bottom: 15px; }
+  .sidebar a { display: block; color: var(--ink); text-decoration: none; padding: 15px 20px; margin-bottom: 12px; border-radius: 12px; background: #0f0819; transition: 0.2s; border: 1px solid #3a1f52; font-family: 'Baloo 2'; font-weight: 700; }
+  .sidebar a:hover { background: linear-gradient(135deg, var(--sakura-3), var(--lilac)); color: #fff; }
+  .menu-btn { position: absolute; left: 20px; top: 20px; z-index: 999; background: var(--card); border: 2px solid #3a1f52; color: #fff; padding: 12px 20px; border-radius: 12px; cursor: pointer; }
+  .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 998; display: none; }
+  .overlay.active { display: block; }
+  .dl-btn{ width:100%; padding:14px; border-radius:14px; font-family:'Baloo 2'; font-weight:800; color:#fff; background: var(--sakura-2); cursor:pointer; border:none; text-align:center; display:none; text-decoration:none;}
+</style>
+<script>
+  function toggleMenu() {
+      document.getElementById('sidebar').classList.toggle('active');
+      document.getElementById('overlay').classList.toggle('active');
+  }
+  function drawRoundedRect(ctx, x, y, w, h, r, fill) {
+      ctx.fillStyle = fill; ctx.beginPath();
+      ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath(); ctx.fill();
+  }
+  function drawCircleImage(ctx, img, cx, cy, r) {
+      ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
+      ctx.drawImage(img, cx - r, cy - r, r * 2, r * 2); ctx.restore();
+  }
+  function wrapText(ctx, text, maxWidth) {
+      const words = text.split(/(\s+)/); const lines = []; let currentLine = '';
+      for (const word of words) {
+          if (!word || (word.trim() === '' && currentLine === '')) continue;
+          const testLine = currentLine + word;
+          if (ctx.measureText(testLine).width > maxWidth) {
+              if (currentLine !== '') { lines.push(currentLine.trimEnd()); currentLine = word.trimStart(); } 
+              else { lines.push(testLine); currentLine = ''; }
+          } else { currentLine = testLine; }
+      }
+      if (currentLine.trim()) lines.push(currentLine.trimEnd());
+      return lines;
+  }
+</script>
+
+</head>
+<body>
+<button class="menu-btn" onclick="toggleMenu()">☰ Buka Menu</button>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+<div class="sidebar" id="sidebar">
+    <h2>⚡ Zepar Features</h2>
+    <a href="index.html">🏠 Home</a>
+    <a href="fake-chat-wa.html">💬 Fake Chat WA</a>
+    <a href="fake-post-ig.html">📸 Fake Post IG</a>
+    <a href="fake-note-ig.html">📝 Fake Note IG</a>
+    <a href="iqc-dark.html">🔮 Fake IQC</a>
+    <a href="ttqc.html">🎵 Fake Tiktok Chat</a>
+    <a href="post-ig-v2.html">✨ Fake Post IG v2</a>
+</div>
+<div class="wrap" style="padding-top: 80px;">
+    <div class="card">
+        <h2 style="color: #fff; font-family: 'Baloo 2';"><span class="badge-dot"></span> Fake Tiktok Chat</h2>
+        <div class="field"><label>Username</label><input type="text" id="username" value="Ditzzx"></div>
+        <div class="field"><label>Chat Text</label><textarea id="chatText">Just friend kok cemburu 😂😂</textarea></div>
+        <div class="field"><label>Avatar Image URL</label><input type="text" id="avatar" value="https://o.uguu.se/clyQgKAG.jpg"></div>
+        <button class="make-btn" onclick="generateTTQC()">Generate Image</button>
+    </div>
+    <div class="canvas-frame"><canvas id="canvas" width="1080" height="2280"></canvas></div>
+    <a id="downloadBtn" class="dl-btn" download="tiktok-chat.png">Download Image</a>
+</div>
+<script>
+async function generateTTQC() {
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const bgImg = new Image(); const avatarImg = new Image();
+    bgImg.crossOrigin = "Anonymous"; avatarImg.crossOrigin = "Anonymous";
+    
+    bgImg.src = 'https://raw.githubusercontent.com/Ditzzx-vibecoder/Assets/main/ttqc/qyzwa.png';
+    avatarImg.src = document.getElementById('avatar').value;
+    
+    await new Promise(r => bgImg.onload = r);
+    await new Promise(r => avatarImg.onload = r);
+    
+    ctx.clearRect(0, 0, 1080, 2280);
+    ctx.drawImage(bgImg, 0, 0, 1080, 2280);
+    
+    drawCircleImage(ctx, avatarImg, 183, 83, 42); // Top PP
+    
+    ctx.font = "bold 34px 'Plus Jakarta Sans', sans-serif";
+    ctx.fillStyle = '#000000'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText(document.getElementById('username').value, 250, 82);
+    
+    const chatText = document.getElementById('chatText').value;
+    ctx.font = "500 30px 'Plus Jakarta Sans', sans-serif";
+    const lines = wrapText(ctx, chatText, 520 - 52);
+    
+    let maxW = 0;
+    lines.forEach(l => { const w = ctx.measureText(l).width; if (w > maxW) maxW = w; });
+    const bubbleW = Math.max(maxW + 60, 180);
+    const bubbleH = lines.length * 43.5 + 48;
+    const bubbleX = 175 - 30;
+    const bubbleY = 962 - 24;
+    
+    drawCircleImage(ctx, avatarImg, 75, bubbleY + bubbleH / 2, 38);
+    drawRoundedRect(ctx, bubbleX, bubbleY, bubbleW, bubbleH, 35, '#ffffff');
+    
+    ctx.fillStyle = '#161823';
+    lines.forEach((line, i) => {
+        ctx.fillText(line, 175, 962 + i * 43.5 + 15);
+    });
+    
+    // Draw Menu (Simplified standard menu drawing from original script)
+    const menuY = bubbleY + bubbleH + 28;
+    drawRoundedRect(ctx, 90, menuY, 565, 580, 40, '#ffffff'); // Add shadow in full version if needed
+    
+    const menuItems = [
+      { u: '\uf3e5', t: 'Balas', c: '#000' }, { u: '\uf064', t: 'Teruskan', c: '#000' },
+      { u: '\uf0c5', t: 'Salin', c: '#000' }, { u: '\uf1ab', t: 'Terjemahkan', c: '#000' },
+      { u: '\uf2ed', t: 'Hapus untuk saya', c: '#000' }, { u: '\uf024', t: 'Laporkan', c: '#ea4335' }
+    ];
+    
+    menuItems.forEach((item, i) => {
+        const cy = menuY + 25 + i * 90 + 45;
+        ctx.fillStyle = item.c;
+        ctx.font = "900 34px 'Font Awesome 6 Free'"; ctx.textAlign = 'center';
+        ctx.fillText(item.u, 150, cy);
+        ctx.font = "500 34px 'Plus Jakarta Sans'"; ctx.textAlign = 'left';
+        ctx.fillText(item.t, 220, cy);
+    });
+    
+    const dlBtn = document.getElementById('downloadBtn');
+    dlBtn.href = canvas.toDataURL('image/png');
+    dlBtn.style.display = 'block';
+}
+</script>
+</body>
+</html>
