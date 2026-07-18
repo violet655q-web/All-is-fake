@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zepar - Fake Chat WA</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sakura-1:#2a0f3d;
+    --sakura-2:#ff2e88;
+    --sakura-3:#c026d3;
+    --lilac:#a855f7;
+    --sky:#22d3ee;
+    --ink:#efe6ff;
+    --paper:#0a0612;
+    --card:#150c22;
+    --gold:#ffd166;
+    --shadow: 0 10px 30px rgba(168, 40, 220, 0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    font-family:'Zen Maru Gothic', sans-serif;
+    color:var(--ink);
+    background-image: url('https://files.catbox.moe/71hgmr.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    overflow-x:hidden;
+    position:relative;
+  }
+  .wrap{position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:36px 20px 80px;}
+  header.hero{ text-align:center; margin-bottom:34px; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'Baloo 2', sans-serif; font-weight:700;
+    font-size:13px; letter-spacing:.14em; text-transform:uppercase;
+    color:#ff6fd4; background:#1a0e2b; border:1px solid #5a2680;
+    padding:6px 16px; border-radius:999px; box-shadow: var(--shadow);
+  }
+  h1.title{
+    font-family:'Baloo 2', sans-serif; font-weight:800;
+    font-size:clamp(32px, 6vw, 54px); margin:16px 0 6px;
+    line-height:1.05; background: linear-gradient(90deg, var(--sakura-2), var(--lilac) 55%, var(--sky));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter: drop-shadow(0 0 18px rgba(192,38,212,.45));
+  }
+  .sub{ color:#b39cc9; font-size:15.5px; max-width:520px; margin:0 auto; }
+  .card{ background:var(--card); border-radius:22px; padding:26px 24px; box-shadow: var(--shadow); border:1px solid #3a1f52; margin-bottom: 20px;}
+  .card h2{ font-family:'Baloo 2', sans-serif; font-size:19px; margin:0 0 18px; display:flex; align-items:center; gap:8px; color:#f0e6ff; }
+  .badge-dot{width:9px; height:9px; border-radius:50%; background:var(--sakura-2); display:inline-block; box-shadow:0 0 8px var(--sakura-2);}
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:12.5px; font-weight:700; color:#9c7fc9; margin-bottom:6px; letter-spacing:.03em; text-transform:uppercase; font-family:'Baloo 2', sans-serif; }
+  .field input[type=text], .field textarea, .field select{ width:100%; padding:11px 13px; border-radius:12px; border:1.5px solid #3a1f52; background:#0f0819; font-family:'Zen Maru Gothic', sans-serif; font-size:14.5px; color:var(--ink); resize:vertical; }
+  .field input:focus, .field textarea:focus, .field select:focus{ outline:none; border-color: var(--sakura-3); box-shadow:0 0 0 3px rgba(192,38,212,.25); }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .file-drop{ border:2px dashed #4a2670; border-radius:14px; padding:14px; text-align:center; cursor:pointer; background:#150c22; font-size:13px; color:#9c7fc9; transition:.15s; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .file-drop:hover{ background:#1e1130; border-color:var(--sakura-3); }
+  .file-drop input{ display:none; }
+  .thumb{ width:34px; height:34px; border-radius:8px; object-fit:cover; display:none; }
+  .toggle-row{ display:flex; gap:10px; }
+  .toggle-row button{ flex:1; padding:10px; border-radius:12px; border:1.5px solid #3a1f52; background:#0f0819; font-family:'Baloo 2', sans-serif; font-weight:700; font-size:13px; color:#9c7fc9; cursor:pointer; transition:.15s; }
+  .toggle-row button.active{ background: linear-gradient(135deg, var(--sakura-3), var(--lilac)); color:#fff; border-color:transparent; }
+  .make-btn{ width:100%; margin-top:6px; padding:14px; border:none; border-radius:14px; font-family:'Baloo 2', sans-serif; font-weight:800; font-size:15.5px; color:#fff; background: linear-gradient(135deg, var(--sakura-3), var(--sky)); cursor:pointer; box-shadow:0 8px 24px rgba(192,38,212,.45); transition:.15s; }
+  .make-btn:hover{ transform:translateY(-2px); box-shadow:0 12px 30px rgba(34,211,238,.4); }
+  .preview-card{ display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .canvas-frame{ width:100%; max-width:360px; border-radius:18px; overflow:hidden; box-shadow: 0 14px 34px rgba(168,40,220,.35); border:6px solid #1a0e2b; background:#0f0819; }
+  .canvas-frame canvas{ width:100%; display:block; }
+  .dl-btn{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:14px; padding:11px 22px; border-radius:12px; border:2px solid var(--sakura-3); background:transparent; color:var(--sakura-2); cursor:pointer; transition:.15s; }
+  .dl-btn:hover{ background:var(--sakura-3); color:#fff; }
+  .hint{ font-size:12px; color:#8a72a8; text-align:center; max-width:300px; }
+  .nav-back{ display:inline-block; margin-bottom: 20px; color: var(--sky); text-decoration: none; font-family: 'Baloo 2'; font-weight: 700; border: 1px solid var(--sky); padding: 5px 15px; border-radius: 8px;}
+  .nav-back:hover { background: var(--sky); color: #000; }
+  .panel-grid { display:grid; grid-template-columns: 1.05fr 1fr; gap:28px; }
+  @media (max-width: 880px){ .panel-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html" class="nav-back">← Kembali ke Menu</a>
+  <header class="hero">
+    <span class="eyebrow">⚡ Zepar Module</span>
+    <h1 class="title">Fake Chat WA</h1>
+  </header>
+
+  <div class="panel-grid">
+    <div class="card">
+      <h2><span class="badge-dot"></span>Atur Chat</h2>
+      <div class="field">
+        <label>Foto Profil</label>
+        <label class="file-drop">
+          <img class="thumb" id="waAvatarThumb">
+          <span id="waAvatarLabel">Klik untuk upload foto profil</span>
+          <input type="file" id="waAvatar" accept="image/*">
+        </label>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Nama</label>
+          <input type="text" id="waName" value="~ Sakura Chan">
+        </div>
+        <div class="field">
+          <label>No. HP</label>
+          <input type="text" id="waPhone" value="+62 812-3456-7890">
+        </div>
+      </div>
+      <div class="field">
+        <label>Tag / status kecil (opsional)</label>
+        <input type="text" id="waTag" value="pacarnya senpai 🌸">
+      </div>
+      <div class="field">
+        <label>Isi pesan</label>
+        <textarea id="waText" rows="3">Perkenalkan, ini gebetan aku ya~ 🌸✨</textarea>
+      </div>
+      <div class="field">
+        <label>Gambar dalam chat (opsional)</label>
+        <label class="file-drop">
+          <img class="thumb" id="waImageThumb">
+          <span id="waImageLabel">Klik untuk upload gambar</span>
+          <input type="file" id="waImage" accept="image/*">
+        </label>
+      </div>
+      <div class="field">
+        <label>Tema</label>
+        <div class="toggle-row">
+          <button type="button" class="wa-mode active" data-mode="dark">🌙 Dark</button>
+          <button type="button" class="wa-mode" data-mode="light">☀️ Light</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Background Chat Custom (opsional)</label>
+        <label class="file-drop">
+          <img class="thumb" id="waBgThumb">
+          <span id="waBgLabel">Upload background chat sendiri</span>
+          <input type="file" id="waBg" accept="image/*">
+        </label>
+      </div>
+      <button class="make-btn" id="waMakeBtn">✨ Buat Quote Chat</button>
+    </div>
+
+    <div class="card preview-card">
+      <h2><span class="badge-dot"></span>Preview</h2>
+      <div class="canvas-frame"><canvas id="waCanvas" width="1024" height="500"></canvas></div>
+      <button class="dl-btn" id="waDownload">⬇️ Unduh PNG</button>
+    </div>
+  </div>
+</div>
+<script>
+
+function readFileAsImage(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const img = new Image();
+      img.onload = ()=>resolve(img);
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+function bindFileDrop(inputId, thumbId, labelId, labelDefaultText, onLoad){
+  const input = document.getElementById(inputId);
+  if(!input) return;
+  const thumb = document.getElementById(thumbId);
+  const label = document.getElementById(labelId);
+  input.addEventListener('change', async ()=>{
+    if(!input.files[0]) return;
+    const img = await readFileAsImage(input.files[0]);
+    thumb.src = img.src;
+    thumb.style.display='inline-block';
+    label.textContent = input.files[0].name;
+    onLoad(img);
+  });
+}
+function wrapText(ctx, text, maxWidth){
+  const words = String(text).split(/\s+/);
+  const lines = [];
+  let line = '';
+  for(const w of words){
+    const test = line ? line+' '+w : w;
+    if(ctx.measureText(test).width > maxWidth && line){
+      lines.push(line);
+      line = w;
+    } else { line = test; }
+  }
+  if(line) lines.push(line);
+  return lines;
+}
+function drawCircleImage(ctx,img,x,y,size){
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(x+size/2,y+size/2,size/2,0,Math.PI*2);
+  ctx.closePath();
+  ctx.clip();
+  const s = Math.max(size/img.width, size/img.height);
+  const dw = img.width*s, dh = img.height*s;
+  ctx.drawImage(img, x+size/2-dw/2, y+size/2-dh/2, dw, dh);
+  ctx.restore();
+}
+function placeholderAvatar(size, hue){
+  const c = document.createElement('canvas');
+  c.width=size; c.height=size;
+  const cx = c.getContext('2d');
+  const grad = cx.createLinearGradient(0,0,size,size);
+  grad.addColorStop(0, `hsl(${hue},80%,80%)`);
+  grad.addColorStop(1, `hsl(${hue+40},80%,70%)`);
+  cx.fillStyle=grad; cx.fillRect(0,0,size,size);
+  cx.font = `${size*0.5}px sans-serif`;
+  cx.textAlign='center'; cx.textBaseline='middle';
+  cx.fillText('🌸', size/2, size/2+2);
+  const img = new Image();
+  img.src = c.toDataURL();
+  return img;
+}
+function drawCoverImage(ctx,img,x,y,w,h){
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x,y,w,h);
+  ctx.clip();
+  const s = Math.max(w/img.width, h/img.height);
+  const dw = img.width*s, dh = img.height*s;
+  ctx.drawImage(img, x+(w-dw)/2, y+(h-dh)/2, dw, dh);
+  ctx.restore();
+}
+
+function roundedPath(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+function bubbleWithTail(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+26);
+  ctx.quadraticCurveTo(x-4,y+10,x-18,y+4); ctx.quadraticCurveTo(x-22,y+2,x-20,y);
+  ctx.quadraticCurveTo(x-10,y,x+r,y); ctx.closePath();
+}
+function drawSakuraBackground(ctx,w,h,palette){
+  const grad = ctx.createLinearGradient(0,0,w,h);
+  grad.addColorStop(0, palette[0]); grad.addColorStop(1, palette[1]);
+  ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+}
+
+let waAvatarImg = null, waImageImg = null, waBgImg = null, waMode='dark';
+bindFileDrop('waAvatar','waAvatarThumb','waAvatarLabel','', img=>{ waAvatarImg = img; });
+bindFileDrop('waImage','waImageThumb','waImageLabel','', img=>{ waImageImg = img; });
+bindFileDrop('waBg','waBgThumb','waBgLabel','', img=>{ waBgImg = img; });
+
+document.querySelectorAll('.wa-mode').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.wa-mode').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); waMode = btn.dataset.mode;
+  });
+});
+
+const WA_THEMES = {
+  dark:   { bg:['#150c22','#2a0f3d'], bubble:'#1e1330', text:'#f0e6ff', sub:'#a98fd1', name:'#ff5ec4' },
+  light:  { bg:['#fdeef5','#eee2ff'], bubble:'#ffffff', text:'#3a2b3d', sub:'#8a7490', name:'#ff6fa5' }
+};
+
+function renderWA(){
+  const canvas = document.getElementById('waCanvas');
+  const ctx = canvas.getContext('2d');
+  const theme = WA_THEMES[waMode];
+  const name = document.getElementById('waName').value || '~ Someone';
+  const phone = document.getElementById('waPhone').value || '';
+  const tag = document.getElementById('waTag').value || '';
+  const text = document.getElementById('waText').value || '';
+  const hasTag = !!tag, hasImage = !!waImageImg;
+  
+  const width = 1024, bubbleX = 108, bubbleY = 60, bubbleRadius = 24;
+  const paddingX = 38, paddingRight = 36, lineHeight = 56;
+  const usernameSize=31, phoneSize=27, tagSize=27, textSize=38, timeSize=27;
+  const avatarSize=72, avatarX=12, avatarY=bubbleY;
+  const time = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',hour12:false}).replace(':','.');
+  
+  ctx.font = `700 ${usernameSize}px 'Baloo 2', sans-serif`;
+  const usernameWidth = ctx.measureText(name).width;
+  ctx.font = `${phoneSize}px 'Zen Maru Gothic', sans-serif`;
+  const phoneWidth = ctx.measureText(phone).width;
+  ctx.font = `${tagSize}px 'Zen Maru Gothic', sans-serif`;
+  const tagWidth = hasTag ? ctx.measureText(tag).width : 0;
+  ctx.font = `${timeSize}px 'Zen Maru Gothic', sans-serif`;
+  const timeWidth = ctx.measureText(time).width;
+  
+  const headerGap = 40, minHeaderWidth = usernameWidth + headerGap + phoneWidth + paddingX + paddingRight;
+  const minTagWidth = hasTag ? (tagWidth + paddingX + paddingRight) : 0;
+  const maxBubbleW = width - bubbleX - 24;
+  const textRightLimit = bubbleX + maxBubbleW - paddingRight - 18;
+  const contentX = bubbleX + paddingX - 5;
+  const textMaxWidth = Math.max(260, textRightLimit - contentX);
+  
+  ctx.font = `${textSize}px 'Zen Maru Gothic', sans-serif`;
+  const lines = text ? wrapText(ctx, text, textMaxWidth) : [];
+  const hasCaption = lines.length>0;
+  
+  let bubbleWidth = maxBubbleW;
+  if(!hasImage){
+    let maxLineWidth = 0;
+    for(const l of lines){ const w = ctx.measureText(l).width; if(w>maxLineWidth) maxLineWidth=w; }
+    let needed = maxLineWidth + paddingX + paddingRight + 25;
+    if(lines.length===1) needed += timeWidth + 15;
+    bubbleWidth = Math.max(needed, minHeaderWidth, minTagWidth);
+    if(bubbleWidth>maxBubbleW) bubbleWidth = maxBubbleW;
+  }
+  
+  const phoneX = bubbleX + bubbleWidth - phoneWidth - paddingRight;
+  const timeX = bubbleX + bubbleWidth - 20;
+  
+  let imageAreaX = bubbleX+8, imageAreaW = bubbleWidth-16, imageDrawH=0;
+  if(hasImage){
+    const aspect = waImageImg.width/waImageImg.height;
+    imageDrawH = Math.round(imageAreaW/aspect);
+  }
+  
+  let headerY, tagY, headerBlockH;
+  if(hasTag){ headerY = bubbleY+52; tagY = headerY+40; headerBlockH=126; }
+  else { headerBlockH=76; headerY = bubbleY+34; }
+  
+  const imageBottomGap = hasImage ? (hasCaption?20:8) : 0;
+  const imageBlockH = hasImage ? (imageDrawH+imageBottomGap) : 0;
+  const textBlockH = lines.length*lineHeight;
+  const timeRowH = (!hasImage && hasCaption) ? 26 : 0;
+  const bottomPad = hasImage ? (hasCaption?20:8) : 0;
+  const bubbleHeight = Math.max(100, headerBlockH+imageBlockH+textBlockH+timeRowH+bottomPad);
+  const imageY = bubbleY+headerBlockH;
+  const textStartY = hasImage ? imageY+imageDrawH+imageBottomGap+(lineHeight/2)-6 : bubbleY+headerBlockH+(textSize/2)+2;
+  const height = Math.round(bubbleY+bubbleHeight+70);
+  
+  canvas.width = width; canvas.height = height;
+  ctx.clearRect(0,0,width,height);
+  if(waBgImg){
+    drawCoverImage(ctx, waBgImg, 0, 0, width, height);
+    ctx.fillStyle = 'rgba(0,0,0,0.28)'; ctx.fillRect(0,0,width,height);
+  } else {
+    drawSakuraBackground(ctx,width,height,theme.bg);
+  }
+  
+  ctx.fillStyle = theme.bubble; ctx.save();
+  ctx.shadowColor='rgba(90,40,70,.18)'; ctx.shadowBlur=18; ctx.shadowOffsetY=6;
+  bubbleWithTail(ctx,bubbleX,bubbleY,bubbleWidth,bubbleHeight,bubbleRadius);
+  ctx.fill(); ctx.restore();
+  
+  const avatar = waAvatarImg || placeholderAvatar(avatarSize,320);
+  drawCircleImage(ctx,avatar,avatarX,avatarY,avatarSize);
+  
+  ctx.textAlign='left'; ctx.textBaseline = hasTag ? 'alphabetic' : 'middle';
+  ctx.font = `700 ${usernameSize}px 'Baloo 2', sans-serif`; ctx.fillStyle = theme.name;
+  ctx.fillText(name, contentX, headerY);
+  
+  ctx.font = `${phoneSize}px 'Zen Maru Gothic', sans-serif`; ctx.fillStyle = theme.sub;
+  ctx.fillText(phone, phoneX, headerY);
+  
+  if(hasTag){
+    ctx.textBaseline='alphabetic'; ctx.font = `${tagSize}px 'Zen Maru Gothic', sans-serif`;
+    ctx.fillStyle = theme.sub; ctx.fillText(tag, contentX, tagY);
+  }
+  
+  if(hasImage){
+    ctx.save(); roundedPath(ctx, imageAreaX, imageY, imageAreaW, imageDrawH, 20); ctx.clip();
+    const s = Math.max(imageAreaW/waImageImg.width, imageDrawH/waImageImg.height);
+    const dw = waImageImg.width*s, dh = waImageImg.height*s;
+    ctx.drawImage(waImageImg, imageAreaX + (imageAreaW-dw)/2, imageY + (imageDrawH-dh)/2, dw, dh);
+    ctx.restore();
+  }
+  
+  ctx.font = `${textSize}px 'Zen Maru Gothic', sans-serif`; ctx.fillStyle = theme.text; ctx.textBaseline='middle';
+  for(let i=0;i<lines.length;i++){ ctx.fillText(lines[i], contentX, textStartY+i*lineHeight); }
+  
+  ctx.font = `${timeSize}px 'Zen Maru Gothic', sans-serif`; ctx.textBaseline='alphabetic';
+  if(hasImage && !hasCaption){
+    ctx.fillStyle='#ffffff'; ctx.textAlign='right'; ctx.save();
+    ctx.shadowColor='rgba(0,0,0,.4)'; ctx.shadowBlur=4; ctx.shadowOffsetX=1; ctx.shadowOffsetY=1;
+    ctx.fillText(time, imageAreaX+imageAreaW-20, imageY+imageDrawH-18); ctx.restore();
+  } else {
+    ctx.fillStyle = theme.sub; ctx.textAlign='right';
+    const timeYOffset = !hasImage ? 13 : 16;
+    ctx.fillText(time, timeX, bubbleY+bubbleHeight-timeYOffset);
+  }
+}
+document.getElementById('waMakeBtn').addEventListener('click', renderWA);
+document.getElementById('waDownload').addEventListener('click', ()=>{
+  const a = document.createElement('a'); a.download = 'fake-chat-wa.png';
+  a.href = document.getElementById('waCanvas').toDataURL('image/png'); a.click();
+});
+renderWA();
+</script>
+</body>
+</html>
