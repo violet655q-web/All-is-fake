@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fake Tiktok Chat - Zepar</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root{
+    --sakura-1:#2a0f3d; --sakura-2:#ff2e88; --sakura-3:#c026d3;
+    --lilac:#a855f7; --sky:#22d3ee; --ink:#efe6ff;
+    --paper:#0a0612; --card:#150c22; --gold:#ffd166;
+    --shadow: 0 10px 30px rgba(168, 40, 220, 0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh; font-family:'Plus Jakarta Sans', sans-serif;
+    color:var(--ink); background-image: url('https://files.catbox.moe/71hgmr.jpg');
+    background-size: cover; background-position: center;
+    background-attachment: fixed; overflow-x:hidden;
+  }
+  .wrap{ max-width:1180px; margin:0 auto; padding:36px 20px 80px; }
+  .card{ background:var(--card); border-radius:22px; padding:26px 24px; box-shadow: var(--shadow); border:1px solid #3a1f52; margin-bottom: 20px;}
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:12.5px; font-weight:700; color:#9c7fc9; margin-bottom:6px; font-family:'Baloo 2', sans-serif; }
+  .field input[type=text], .field textarea{ width:100%; padding:11px 13px; border-radius:12px; border:1.5px solid #3a1f52; background:#0f0819; color:var(--ink); }
+  
+  .file-drop{ border:2px dashed #4a2670; border-radius:14px; padding:14px; text-align:center; cursor:pointer; background:#150c22; font-size:13px; color:#9c7fc9; transition:.15s; display:flex; align-items:center; justify-content:center; gap:8px; width: 100%;}
+  .file-drop:hover{ background:#1e1130; border-color:var(--sakura-3); }
+  .file-drop input{ display:none; }
+  .thumb{ width:34px; height:34px; border-radius:8px; object-fit:cover; display:none; }
+
+  .make-btn{ width:100%; padding:14px; border-radius:14px; font-family:'Baloo 2'; font-weight:800; color:#fff; background: linear-gradient(135deg, var(--sakura-3), var(--sky)); cursor:pointer; border:none; margin-top: 10px;}
+  .canvas-frame{ width:100%; max-width:360px; border-radius:18px; border:6px solid #1a0e2b; background:#0f0819; margin: 20px auto; display:block; }
+  .canvas-frame canvas{ width:100%; display:block; }
+  .dl-btn{ width:100%; padding:14px; border-radius:14px; font-family:'Baloo 2'; font-weight:800; color:#fff; background: var(--sakura-2); cursor:pointer; border:none; text-align:center; display:none; text-decoration:none;}
+  
+  
+  /* Sidebar Styles */
+  .sidebar { position: fixed; left: -300px; top: 0; width: 300px; height: 100%; background: var(--card); border-right: 2px solid #3a1f52; transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; padding: 20px; box-shadow: var(--shadow); overflow-y: auto;}
+  .sidebar.active { left: 0; }
+  .sidebar h2 { color: #fff; font-family: 'Baloo 2'; margin-bottom: 30px; font-size: 24px; text-align: center; border-bottom: 1px solid #3a1f52; padding-bottom: 15px; }
+  .sidebar a { display: flex; align-items: center; color: var(--ink); text-decoration: none; padding: 15px 20px; margin-bottom: 12px; border-radius: 12px; background: #0f0819; border: 1px solid #3a1f52; font-family: 'Baloo 2'; font-weight: 700; opacity: 0; transform: translateX(-50px); transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+  .sidebar a:hover { background: linear-gradient(135deg, var(--sakura-3), var(--lilac)); color: #fff; }
+  .nav-icon { width: 24px; height: 24px; object-fit: contain; margin-right: 12px; }
+  .sidebar.active a { opacity: 1; transform: translateX(0); }
+  .sidebar a:nth-child(2) { transition-delay: 0.15s; }
+  .sidebar a:nth-child(3) { transition-delay: 0.25s; }
+  .sidebar a:nth-child(4) { transition-delay: 0.35s; }
+  .sidebar a:nth-child(5) { transition-delay: 0.45s; }
+  .sidebar a:nth-child(6) { transition-delay: 0.55s; }
+  .sidebar a:nth-child(7) { transition-delay: 0.65s; }
+  .sidebar a:nth-child(8) { transition-delay: 0.75s; }
+  .sidebar a:nth-child(9) { transition-delay: 0.85s; }
+  .sidebar a:nth-child(10) { transition-delay: 0.95s; }
+  .menu-btn { position: absolute; left: 20px; top: 20px; z-index: 999; background: var(--card); border: 2px solid #3a1f52; color: #fff; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-family: 'Baloo 2', sans-serif;}
+  .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 998; display: none; transition: opacity 0.4s; opacity: 0; }
+  .overlay.active { display: block; opacity: 1; }
+
+</style>
+<script>
+  function drawRoundedRect(ctx, x, y, w, h, r, fill) {
+      ctx.fillStyle = fill; ctx.beginPath();
+      ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath(); ctx.fill();
+  }
+  function drawCircleImage(ctx, img, cx, cy, r) {
+      ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
+      ctx.drawImage(img, cx - r, cy - r, r * 2, r * 2); ctx.restore();
+  }
+  function wrapText(ctx, text, maxWidth) {
+      const words = text.split(/(\s+)/); const lines = []; let currentLine = '';
+      for (const word of words) {
+          if (!word || (word.trim() === '' && currentLine === '')) continue;
+          const testLine = currentLine + word;
+          if (ctx.measureText(testLine).width > maxWidth) {
+              if (currentLine !== '') { lines.push(currentLine.trimEnd()); currentLine = word.trimStart(); } 
+              else { lines.push(testLine); currentLine = ''; }
+          } else { currentLine = testLine; }
+      }
+      if (currentLine.trim()) lines.push(currentLine.trimEnd());
+      return lines;
+  }
+  function readFileAsImage(file){
+    return new Promise((resolve,reject)=>{
+      const reader = new FileReader();
+      reader.onload = e=>{
+        const img = new Image();
+        img.onload = ()=>resolve(img);
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+  function bindFileDrop(inputId, thumbId, labelId, onLoad){
+    const input = document.getElementById(inputId);
+    if(!input) return;
+    const thumb = document.getElementById(thumbId);
+    const label = document.getElementById(labelId);
+    input.addEventListener('change', async ()=>{
+      if(!input.files[0]) return;
+      const img = await readFileAsImage(input.files[0]);
+      thumb.src = img.src;
+      thumb.style.display='inline-block';
+      label.textContent = input.files[0].name;
+      onLoad(img);
+    });
+  }
+</script>
+</head>
+<body>
+
+<button class="menu-btn" onclick="toggleMenu()">☰ Buka Menu</button>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<div class="sidebar" id="sidebar">
+    <h2>⚡ Zepar Features</h2>
+    <a href="index.html"><img src="icon/home.png" alt="home" class="nav-icon"> Home</a>
+    <a href="fake-chat-wa.html"><img src="icon/wa.png" alt="wa" class="nav-icon"> Fake Chat WA</a>
+    <a href="fake-saldo-dana.html"><img src="icon/dana.png" alt="dana" class="nav-icon"> Fake Saldo DANA</a>
+    <a href="fake-post-ig.html"><img src="icon/ig.png" alt="ig" class="nav-icon"> Fake Post IG</a>
+    <a href="fake-note-ig.html"><img src="icon/note.png" alt="note" class="nav-icon"> Fake Note IG</a>
+    <a href="iqc-dark.html"><img src="icon/iqc.png" alt="iqc" class="nav-icon"> Fake IQC</a>
+    <a href="ttqc.html"><img src="icon/tiktok.png" alt="tiktok" class="nav-icon"> Fake Tiktok Chat</a>
+    <a href="post-ig-v2.html"><img src="icon/ig-v2.png" alt="ig v2" class="nav-icon"> Fake Post IG v2</a>
+    <a href="fake-call-ios.html"><img src="icon/call.png" alt="call" class="nav-icon"> Fake Call iOS</a>
+</div>
+
+<div class="wrap" style="padding-top: 80px;">
+    <div class="card">
+        <h2 style="color: #fff; font-family: 'Baloo 2';">Fake Tiktok Chat</h2>
+        <div class="field"><label>Username</label><input type="text" id="username" value="Ditzzx"></div>
+        <div class="field"><label>Chat Text</label><textarea id="chatText">Just friend kok cemburu 😂😂</textarea></div>
+        
+        <div class="field">
+          <label>Avatar Image</label>
+          <label class="file-drop">
+            <img class="thumb" id="avThumb">
+            <span id="avLabel">Klik untuk upload foto avatar</span>
+            <input type="file" id="avatarFile" accept="image/*">
+          </label>
+        </div>
+
+        <button class="make-btn" onclick="generateTTQC()">Generate Image</button>
+    </div>
+    <div class="canvas-frame"><canvas id="canvas" width="1080" height="2280"></canvas></div>
+    <a id="downloadBtn" class="dl-btn" download="tiktok-chat.png">Download Image</a>
+</div>
+<script>
+let uploadedAvatar = null;
+bindFileDrop('avatarFile', 'avThumb', 'avLabel', img => { uploadedAvatar = img; });
+
+async function generateTTQC() {
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const bgImg = new Image(); 
+    bgImg.crossOrigin = "Anonymous"; 
+    bgImg.src = 'https://raw.githubusercontent.com/Ditzzx-vibecoder/Assets/main/ttqc/qyzwa.png';
+    
+    await new Promise(r => { bgImg.onload = r; bgImg.onerror = r; });
+    
+    ctx.clearRect(0, 0, 1080, 2280);
+    ctx.fillStyle = '#000'; ctx.fillRect(0,0,1080,2280);
+    try { ctx.drawImage(bgImg, 0, 0, 1080, 2280); } catch(e) {}
+    
+    if(uploadedAvatar) {
+        drawCircleImage(ctx, uploadedAvatar, 183, 83, 42); // Top PP
+    } else {
+        ctx.fillStyle = '#3a1f52'; ctx.beginPath(); ctx.arc(183, 83, 42, 0, Math.PI*2); ctx.fill();
+    }
+    
+    ctx.font = "bold 34px 'Plus Jakarta Sans', sans-serif";
+    ctx.fillStyle = '#000000'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText(document.getElementById('username').value, 250, 82);
+    
+    const chatText = document.getElementById('chatText').value;
+    ctx.font = "500 30px 'Plus Jakarta Sans', sans-serif";
+    const lines = wrapText(ctx, chatText, 520 - 52);
+    
+    let maxW = 0;
+    lines.forEach(l => { const w = ctx.measureText(l).width; if (w > maxW) maxW = w; });
+    const bubbleW = Math.max(maxW + 60, 180);
+    const bubbleH = lines.length * 43.5 + 48;
+    const bubbleX = 175 - 30;
+    const bubbleY = 962 - 24;
+    
+    if(uploadedAvatar) {
+        drawCircleImage(ctx, uploadedAvatar, 75, bubbleY + bubbleH / 2, 38);
+    } else {
+        ctx.fillStyle = '#3a1f52'; ctx.beginPath(); ctx.arc(75, bubbleY + bubbleH / 2, 38, 0, Math.PI*2); ctx.fill();
+    }
+
+    drawRoundedRect(ctx, bubbleX, bubbleY, bubbleW, bubbleH, 35, '#ffffff');
+    
+    ctx.fillStyle = '#161823';
+    lines.forEach((line, i) => {
+        ctx.fillText(line, 175, 962 + i * 43.5 + 15);
+    });
+    
+    const menuY = bubbleY + bubbleH + 28;
+    drawRoundedRect(ctx, 90, menuY, 565, 580, 40, '#ffffff'); 
+    
+    const menuItems = [
+      { u: '\uf3e5', t: 'Balas', c: '#000' }, { u: '\uf064', t: 'Teruskan', c: '#000' },
+      { u: '\uf0c5', t: 'Salin', c: '#000' }, { u: '\uf1ab', t: 'Terjemahkan', c: '#000' },
+      { u: '\uf2ed', t: 'Hapus untuk saya', c: '#000' }, { u: '\uf024', t: 'Laporkan', c: '#ea4335' }
+    ];
+    
+    menuItems.forEach((item, i) => {
+        const cy = menuY + 25 + i * 90 + 45;
+        ctx.fillStyle = item.c;
+        ctx.font = "900 34px 'Font Awesome 6 Free'"; ctx.textAlign = 'center';
+        ctx.fillText(item.u, 150, cy);
+        ctx.font = "500 34px 'Plus Jakarta Sans'"; ctx.textAlign = 'left';
+        ctx.fillText(item.t, 220, cy);
+    });
+    
+    const dlBtn = document.getElementById('downloadBtn');
+    dlBtn.href = canvas.toDataURL('image/png');
+    dlBtn.style.display = 'block';
+}
+</script>
+
+<script>
+  function toggleMenu() {
+      document.getElementById('sidebar').classList.toggle('active');
+      document.getElementById('overlay').classList.toggle('active');
+  }
+
+  let touchstartX = 0;
+  let touchendX = 0;
+
+  function handleSwipe() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      
+      if (touchendX > touchstartX + 60 && touchstartX < 50) {
+          sidebar.classList.add('active');
+          overlay.classList.add('active');
+      }
+      if (touchendX < touchstartX - 50 && sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+          overlay.classList.remove('active');
+      }
+  }
+
+  document.addEventListener('touchstart', e => {
+      touchstartX = e.changedTouches[0].screenX;
+  });
+
+  document.addEventListener('touchend', e => {
+      touchendX = e.changedTouches[0].screenX;
+      handleSwipe();
+  });
+</script>
+
+</body>
+</html>
